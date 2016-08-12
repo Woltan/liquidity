@@ -1,2 +1,2 @@
 # liquidity
-A book keeping django application
+A liquidity planning django application
