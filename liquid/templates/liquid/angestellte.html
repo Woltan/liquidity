@@ -1,0 +1,15 @@
+{% extends "liquid/base.html" %}
+{% block body %}
+<a href="/">Zurück</a>
+<ul>
+{% for angestellter in angestellte %}
+<li><a href="/angestellter/{{ angestellter.id }}">{{ angestellter.Name }}</a></li>
+<ul>
+<li>Gehalt: {{ angestellter.Gehalt }}€</li>
+<li>Einstellungsdatum: {{ angestellter.Einstellungsdatum }}</li>
+<li>Entlassungssdatum: {% if angestellter.Entlassungssdatum != None %}{{ angestellter.Entlassungssdatum }}{% else %}/{% endif %}</li>
+</ul>
+{% endfor %}
+</ul>
+<a href="/angestellter/neu">Neuen Angestellten erstellen</a>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "liquid/base.html" %}
+{% block body %}
+<a href="/">Zurück</a>
+<ul>
+{% for projekt in projekte %}
+<li><a href="/projekt/{{ projekt.id }}">{{ projekt.Titel }}</a></li>
+<ul>
+<li>Startdatum:{{ projekt.Startdatum }}</li>
+<li>Enddatum:{{ projekt.Enddatum }}</li>
+<li>Einnahmen:{{ projekt.Einnahmen }}€</li>
+</ul>
+{% endfor %}
+</ul>
+<a href="/projekt/neu">Neues Projekt erstellen</a>
+{% endblock %}
