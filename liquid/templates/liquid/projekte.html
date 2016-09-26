@@ -1,15 +1,44 @@
 {% extends "liquid/base.html" %}
+
+{% block script %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#projektTabelle').DataTable();
+} );
+</script>
+{% endblock script %}
+
 {% block body %}
-<a href="/">Zurück</a>
-<ul>
-{% for projekt in projekte %}
-<li><a href="/projekt/{{ projekt.id }}">{{ projekt.Titel }}</a></li>
-<ul>
-<li>Startdatum:{{ projekt.Startdatum }}</li>
-<li>Enddatum:{{ projekt.Enddatum }}</li>
-<li>Einnahmen:{{ projekt.Einnahmen }}€</li>
-</ul>
-{% endfor %}
-</ul>
-<a href="/projekt/neu">Neues Projekt erstellen</a>
+<a href="/">Zurück</a><br>
+<a href="/projekt/neu">Neues Projekt erstellen</a><br>
+<div style="float: left; width: 50%">
+<table id="projektTabelle" class="display" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Titel</th>
+                <th>Startdatum</th>
+                <th>Enddatum</th>
+                <th>Einnahmen</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>Titel</th>
+                <th>Startdatum</th>
+                <th>Enddatum</th>
+                <th>Einnahmen</th>
+            </tr>
+        </tfoot>
+        <tbody>
+			{% for projekt in projekte %}
+            <tr>
+                <td><a href="/projekt/{{ projekt.id }}">{{ projekt.Titel }}</a></td>
+                <td>{{ projekt.Startdatum }}</td>
+                <td>{{ projekt.Enddatum }}</td>
+                <td>{{ projekt.Einnahmen }}</td>
+            </tr>
+			{% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
