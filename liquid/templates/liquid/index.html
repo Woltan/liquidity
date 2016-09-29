@@ -2,7 +2,41 @@
 
 {% block script %}
 <script type="text/javascript">
-$(function () {
+$(document).ready(function() {
+    $('#projektTabelle').DataTable();
+    $('#angestelltenTabelle').DataTable();
+	
+	var jAngestellte = [];
+	{% for gehalt in gehaelter %}
+		jAngestellte.push([{% for g in gehalt %}{{ g }},{% endfor %}]);
+	{% endfor %}
+	var jEinnahmen = []
+	{% for pEinnahmen in einnahmen %}
+		jEinnahmen.push([{% for e in pEinnahmen %}{{ e }},{% endfor %}]);
+	{% endfor %}
+	
+	
+	var data = [];
+	var einnahmen = 0;
+	var gehalt = 0;
+	for(i = 0; i < 24; i++){
+		einnahmen = 0;
+		gehalt = 0;
+		var j;
+		for(j in jEinnahmen){
+			einnahmen += jEinnahmen[j][i];
+		}
+		for(j in jAngestellte){
+			gehalt = gehalt + jAngestellte[j][i];
+		}
+		if(i == 0){
+			data.push(einnahmen - gehalt);
+		}
+		else{
+			data.push(data[i - 1] + einnahmen - gehalt);
+		}
+	}
+		
     $('#container').highcharts({
         title: {
             text: 'Kontoentwicklung',
@@ -10,18 +44,80 @@ $(function () {
         },
         series: [{
             name: 'Kontoentwicklung',
-            data: [
-			{% for k in kontoverlauf %}
-			{{ k }},
-			{% endfor %}
-			]
+            data: data,
         }]
     });
 });
 </script>
-{% endblock %}
+{% endblock script %}
 {% block body %}
+
+<p id="debugDummy">Dummy</p>
+
 <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-<a href="projekte">Projekte</a><br>
-<a href="angestellte">Angestellte</a>
-{% endblock %}
+
+<div style="float: left; width: 45%">
+<a href="/projekt/neu">Neues Projekt erstellen</a><br>
+<table id="projektTabelle" class="display" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Titel</th>
+                <th>Startdatum</th>
+                <th>Enddatum</th>
+                <th>Einnahmen</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>Titel</th>
+                <th>Startdatum</th>
+                <th>Enddatum</th>
+                <th>Einnahmen</th>
+            </tr>
+        </tfoot>
+        <tbody>
+			{% for projekt in projekte %}
+            <tr>
+                <td><a href="/projekt/{{ projekt.id }}">{{ projekt.Titel }}</a></td>
+                <td>{{ projekt.Startdatum }}</td>
+                <td>{{ projekt.Enddatum }}</td>
+                <td>{{ projekt.Einnahmen }}</td>
+            </tr>
+			{% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="float: right; width: 45%">
+<a href="/angestellter/neu">Neuen Angestellten erstellen</a>
+<table id="angestelltenTabelle" class="display" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Gehalt</th>
+                <th>Einstellungsdatum</th>
+                <th>Entlassungssdatum</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>Name</th>
+                <th>Gehalt</th>
+                <th>Einstellungsdatum</th>
+                <th>Entlassungssdatum</th>
+            </tr>
+        </tfoot>
+        <tbody>
+			{% for angestellter in angestellte %}
+            <tr>
+                <td><a href="/angestellter/{{ angestellter.id }}">{{ angestellter.Name }}</a></td>
+                <td>{{ angestellter.Gehalt }}€</td>
+                <td>{{ angestellter.Einstellungsdatum }}</td>
+                <td>{% if angestellter.Entlassungsdatum %}{{ angestellter.Entlassungsdatum }}{% else %}/{% endif %}</td>
+            </tr>
+			{% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock body %}

@@ -21,3 +21,7 @@ class AngestellterForm(forms.ModelForm):
 	class Meta:
 		model = Angestellter
 		fields = "__all__"
+		widgets = {
+				"Einstellungsdatum": forms.SelectDateWidget(years=range(2015, 2020)),
+				"Entlassungsdatum": forms.SelectDateWidget(years=range(2015, 2020)),
+				}

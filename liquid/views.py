@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from django.http import HttpResponseRedirect
 from django.views import View
 from django.shortcuts import render
@@ -8,20 +8,11 @@ from .forms import AngestellterForm, ProjektForm
 
 class IndexView(View):
 	def get(self, request):
-		currDatum = date(date.today().year, date.today().month, 1)
-		kontoverlauf = [0]
-		for _ in range(24):
-			nextDatum = date(currDatum.year if currDatum.month < 12 else currDatum.year + 1,
-							 currDatum.month + 1 if currDatum.month < 12 else 1, 1)
-			
-			kontoverlauf.append(kontoverlauf[-1] - Angestellter.Gehaelter(currDatum, nextDatum) + Projekt.ProjektEinnahmen(currDatum, nextDatum))
-			currDatum = nextDatum
-			
-		return render(request, "liquid/index.html", {"kontoverlauf": kontoverlauf})
-
-class ProjekteView(View):
-	def get(self, request):
-		return render(request, "liquid/projekte.html", {"projekte": Projekt.objects.all()})
+		projekte = Projekt.objects.all()
+		angestellte = Angestellter.objects.all()
+		einnahmen = [p.ProjektEinnahmen(date(datetime.today().year, datetime.today().month, 1), 24) for p in projekte]
+		gehaelter = [a.Gehaelter(date(datetime.today().year, datetime.today().month, 1), 24) for a in angestellte]
+		return render(request, "liquid/index.html", {"projekte": projekte, "angestellte": angestellte, "einnahmen": einnahmen, "gehaelter": gehaelter})
 
 class ProjektView(View):
 	def get(self, request, p_id=""):
@@ -38,13 +29,9 @@ class ProjektView(View):
 		
 		if form.is_valid():
 			form.save()
-			return HttpResponseRedirect("/projekte")
+			return HttpResponseRedirect("/")
 		
 		return render(request, "liquid/projekt_form.html", {"form": form})
-
-class AngestellteView(View):
-	def get(self, request):
-		return render(request, "liquid/angestellte.html", {"angestellte": Angestellter.objects.all()})
 
 class AngestellterView(View):
 	def get(self, request, a_id=""):
@@ -61,6 +48,6 @@ class AngestellterView(View):
 		
 		if form.is_valid():
 			form.save()
-			return HttpResponseRedirect("/angestellte")
+			return HttpResponseRedirect("/")
 		
 		return render(request, "liquid/angestellter_form.html", {"form": form})

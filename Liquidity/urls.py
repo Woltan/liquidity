@@ -21,8 +21,6 @@ from liquid import views
 urlpatterns = [
 	url(r'^admin/', admin.site.urls),
 	url(r'^$', views.IndexView.as_view()),
-	url(r'^projekte/', views.ProjekteView.as_view()),
 	url(r'^projekt/(?P<p_id>\d*)', views.ProjektView.as_view()),
-	url(r'^angestellte/', views.AngestellteView.as_view()),
 	url(r'^angestellter/(?P<a_id>\d*)', views.AngestellterView.as_view()),
 ]

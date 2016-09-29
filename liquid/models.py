@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from datetime import date
 
 from django.db import models
 
@@ -11,11 +12,18 @@ class Projekt(models.Model):
 	def __str__(self):
 		return "{:} ({:} Euro)".format(self.Titel, self.Einnahmen)
 	
-	@classmethod
-	def ProjektEinnahmen(cls, startZeit, endZeit):
-		k = sum([p.Einnahmen if startZeit <= p.Enddatum < endZeit else 0 for p in cls.objects.all()])
-		print startZeit, endZeit, k
-		return k 
+	def ProjektEinnahmen(self, startZeit, zeitraum):
+		currZeit = startZeit
+		einnahmen = list()
+		for _ in range(zeitraum):
+			nextZeit = date(currZeit.year if currZeit.month < 12 else currZeit.year + 1, currZeit.month + 1 if currZeit.month < 12 else 1, 1)
+			if currZeit <= self.Enddatum < nextZeit:
+				einnahmen.append(self.Einnahmen)
+			else:
+				einnahmen.append(0)
+			currZeit = nextZeit
+		
+		return einnahmen
 
 class Angestellter(models.Model):
 	Name = models.CharField(max_length=64, unique=True)
@@ -26,15 +34,18 @@ class Angestellter(models.Model):
 	def __str__(self):
 		return self.Name
 	
-	@classmethod
-	def Gehaelter(cls, startZeit, endZeit):
-		gehaelter = 0
-		for a in cls.objects.all():
-			if a.Einstellungsdatum > startZeit:
-				continue
+	def Gehaelter(self, startZeit, zeitraum=24):
+		currDate = startZeit
+		gehaelter = list()
+		for _ in range(zeitraum):
+			if self.Einstellungsdatum > currDate:
+				gehaelter.append(0)
+			else:
+				if self.Entlassungsdatum != None and self.Entlassungsdatum < currDate:
+					gehaelter.append(0)
+				else:
+					gehaelter.append(self.Gehalt)
 			
-			if a.Entlassungsdatum != None and a.Entlassungsdatum < endZeit:
-				continue
-			gehaelter += a.Gehalt
-		
+			currDate = date(currDate.year if currDate.month < 12 else currDate.year + 1, currDate.month + 1 if currDate.month < 12 else 1, 1)
+			
 		return gehaelter
